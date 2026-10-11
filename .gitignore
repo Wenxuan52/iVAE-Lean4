@@ -1,0 +1,5 @@
+/.lake
+/tools/
+/docs/*.log
+/docs/*.aux
+/docs/*.out
