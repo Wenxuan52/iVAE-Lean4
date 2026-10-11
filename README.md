@@ -1,25 +1,26 @@
-# iVAE：almost everywhere 定理一的 Lean 4 形式化
+# iVAE: Almost-Everywhere Identifiability in Lean 4
 
-本仓库只维护当前已形式化的 **a.e. 仿射可识别性定理一（Step I–III）** 及其必要的定义、引理和证明文档。数学来源是 Khemakhem、Kingma、Monti、Hyvärinen 的 iVAE 论文 corrected arXiv v4。
+This repository formalizes a corrected **almost-everywhere affine identifiability theorem for iVAE (Theorem 1, Steps I–III)** using Lean 4 and Mathlib. It contains the complete proof, its supporting definitions and lemmas, and accompanying mathematical proof documents.
 
-主定理位于 [`Ivae/Theorem1.lean`](Ivae/Theorem1.lean)：
+The mathematical source is Khemakhem, Kingma, Monti, and Hyvärinen, *Variational Autoencoders and Nonlinear ICA: A Unifying Framework*, corrected [arXiv v4](https://arxiv.org/abs/1907.04809v4).
+
+The main theorem is in [`Ivae/Theorem1.lean`](Ivae/Theorem1.lean):
 
 ```lean
 IVAE.correctedTheorem1_stepI_II_III
 ```
 
-若两个模型在选定的 `nk+1` 个辅助值处具有相同的含噪观测分布，在下面列出的假设下，存在一个固定的可逆线性映射 `A` 和向量 `c`，使
+Under the assumptions below, equality of the noisy observation laws at the selected `nk+1` auxiliary values implies the existence of a fixed invertible linear map `A` and a vector `c` such that
 
 ```text
-T(f⁻¹(x)) = A T′(f′⁻¹(x)) + c，μ-almost everywhere。
+T(f⁻¹(x)) = A T′(f′⁻¹(x)) + c, μ-almost everywhere.
 ```
 
-这里 `μ ≪ M.imageLaw V.pivot`。逆函数只定义在共同无噪声像域 `X` 上，维数保持一般的 `n,d,m,k`，包括 `n < d`。主定理名称、数学假设及证明正文在仓库整理中均保持不变。
+The reference measure satisfies `μ ≪ M.imageLaw V.pivot`. Each inverse is defined on the common noiseless mixing image `X`. The formalization retains general dimensions `n,d,m,k`, including `n < d`.
 
-## 构建与验证
+## Build and verify
 
-安装 Lean 工具链管理器 Elan 后，在本目录运行。首次获取项目时，先下载
-Mathlib 的预编译缓存，再构建证明：
+After installing the Lean toolchain manager Elan, run the following commands from the repository root. On a fresh checkout, first download Mathlib's precompiled cache:
 
 ```bash
 lake exe cache get
@@ -27,66 +28,64 @@ lake build
 lake env lean scripts/CheckAxioms.lean
 ```
 
-工具链固定为 `leanprover/lean4:v4.34.0-rc2`，Mathlib 版本由 `lake-manifest.json` 锁定。项目直接依赖只有 Mathlib；`lake build` 构建唯一的 `Ivae` 库。
+The toolchain is pinned to `leanprover/lean4:v4.34.0-rc2`, and `lake-manifest.json` locks the Mathlib revision and its dependencies. Mathlib is the project's only direct dependency. The default build target is the `Ivae` library.
 
-第二条命令检查主定理、所有条件分布的推论、Step III 可逆性、非退化性的两种表述以及 a.e. 等价关系的公理依赖，只允许 Lean 的 `propext`、`Classical.choice` 和 `Quot.sound`。发现 `sorryAx` 或任何其他公理时会报错。CI 同样执行构建和该检查。
+The final command checks the axiom dependencies of the main theorem, its consequence for all conditional laws, Step III invertibility, the two formulations of nondegeneracy, and the a.e. equivalence relation. It allows only Lean's usual foundational axioms: `propext`, `Classical.choice`, and `Quot.sound`. Any dependency on `sorryAx` or another axiom causes an error. GitHub Actions runs the build and this check.
 
-## 当前定理的假设和结论
+## Assumptions and conclusion
 
-- **模型与像域：** 两模型使用共同的可测潜域 `Z` 和像域 `X`。`Params.f_bijOn` 表示混合函数限制到 `Z` 后是到 `X` 的双射；正向映射和像上逆映射可测。
-- **有效先验：** 论文 equation (7) 的乘积形式；基函数非负、正规化因子为正、每个条件先验可测且积分为 1。
-- **噪声：** 共同的有限噪声测度，其特征函数的零集在整个频域 `ℝᵈ` 上是 Lebesgue 零测集。
-- **辅助变化：** 真实模型提供 `nk+1` 个不同的辅助值，其差分矩阵 `L` 的行列式非零。
-- **Step III 的额外假设：** 真实 pivot 先验下的 `AEAffineNondegenerate`：统计量的任意几乎处处常数线性泛函必须为零。
-- **参考测度：** `μ` 对真实模型的 pivot 无噪声像分布绝对连续。
+- **Models and domains:** both models share measurable latent and image domains `Z` and `X`. `Params.f_bijOn` states that the mixing function restricted to `Z` is a bijection onto `X`. The restricted mixing map and its image-level inverse are measurable.
+- **Valid priors:** the priors have the product form of equation (7), with nonnegative base functions, positive normalizers, and measurable conditional densities whose integrals are 1.
+- **Noise:** both models use the same finite noise measure. Its characteristic function has a Lebesgue-null zero set on the entire frequency space `ℝᵈ`.
+- **Auxiliary variation:** the true model supplies `nk+1` distinct auxiliary values, and its difference matrix `L` has nonzero determinant.
+- **Additional Step III assumption:** `AEAffineNondegenerate` holds under the true pivot prior. No nonzero linear functional of the sufficient-statistic vector is constant almost surely under that prior.
+- **Reference measure:** `μ` is absolutely continuous with respect to the true model's noiseless pivot image law.
 
-结论是 `SimAAE μ θ θ′`。额外的仿射非退化性仍是显式前提，未从原论文 assumption (iii) 推导；当前结果是修正版的 a.e. 定理，不声称原论文的逐点结论。
+The conclusion is `SimAAE μ θ θ′`. Essential affine nondegeneracy is an explicit additional assumption; the formalization does not derive it from the paper's assumption (iii). The result is a corrected a.e. theorem and does not establish the original pointwise conclusion.
 
-[`correctedTheorem1_all_conditional_laws`](Ivae/Theorem1.lean) 进一步证明：同一组 `A,c` 在两模型的每个条件无噪声分布下都几乎处处成立。
+The companion theorem [`correctedTheorem1_all_conditional_laws`](Ivae/Theorem1.lean) proves that the same witnesses `A,c` work almost everywhere under every conditional noiseless law of either model.
 
-## 文件导航
+## Repository layout
 
 ```text
-Ivae.lean                       唯一库入口，导入 Ivae.Theorem1
+Ivae.lean                       Library entry point; imports Ivae.Theorem1
 Ivae/
-├── Basic.lean                  向量、参数、像上逆、统计量
-├── IdentifiabilityAE.lean      SimAE / SimAAE 与固定测度下的等价关系
-├── Deconvolution.lean          Step I：特征函数与去卷积
-├── MeasureTransport.lean       域上 Lebesgue 测度及加权测度的传输
-├── MeasureModel.lean           equation (7) 模型、概率分布与密度比
-├── AuxiliaryVariation.lean     nk+1 个辅助点与差分矩阵 L
-├── PivotSystem.lean            Step II：由 pivot 方程求出固定仿射映射
-├── AffineNondegeneracy.lean     Step III：非退化性与仿射映射可逆性
-└── Theorem1.lean               组装 Step I–III；主定理及条件分布推论
-scripts/CheckAxioms.lean        公理依赖检查
-docs/                          当前定理的中英文数学证明（TeX / PDF）
+├── Basic.lean                  Vectors, parameters, image-level inverse, statistics
+├── IdentifiabilityAE.lean      SimAE / SimAAE and relation properties for a fixed measure
+├── Deconvolution.lean          Step I: characteristic functions and deconvolution
+├── MeasureTransport.lean       Domain Lebesgue measure and weighted-measure transport
+├── MeasureModel.lean           Equation-(7) models, probability laws, and density ratios
+├── AuxiliaryVariation.lean     nk+1 auxiliary values and the variation matrix L
+├── PivotSystem.lean            Step II: solve the pivot system for a fixed affine map
+├── AffineNondegeneracy.lean     Step III: nondegeneracy and invertibility
+└── Theorem1.lean               Assemble Steps I–III and the conditional-law consequence
+scripts/CheckAxioms.lean        Check foundational axiom dependencies
+docs/                          English and Chinese mathematical proofs (TeX / PDF)
 ```
 
-## 按数学步骤阅读
+## Reading the proof
 
-| 步骤 | 主要声明 | 数学作用 |
+| Step | Main declarations | Mathematical role |
 | --- | --- | --- |
-| Step I | `deconvolution_of_vectorCharFun_zeroSet_null`；`MeasureModel.imageLaw_eq_of_observationLaw_eq` | 消去共同噪声，从含噪分布相等得到像分布相等 |
-| 密度比 | `MeasureModel.imageLaw_ratio`；`MeasureModel.log_imageRatio_ae` | 使用真实 pivot 像分布作参考，消去基函数，无需像空间 Jacobian |
-| Step II | `MeasureModel.imageRatio_ae_eq`；`MeasureModel.pivot_equation` | 在共同的满测集上得到有限辅助点线性方程组 |
-| 求解 | `simAE_of_pivot_equation`；`MeasureModel.stepII` | 左乘 `Lᵀ` 的逆，得到一组固定的 `A,c` |
-| Step III | `MeasureModel.image_nondegenerate`；`affineWitness_bijective` | 推前非退化性，排除非零左零空间泛函，证明同一个 `A` 可逆 |
-| 组装 | `correctedTheorem1_stepI_II_III` | 将 pivot 分布下的可逆仿射关系传递到任意受其支配的 `μ` |
+| Step I | `deconvolution_of_vectorCharFun_zeroSet_null`; `MeasureModel.imageLaw_eq_of_observationLaw_eq` | Cancel the common noise and recover equality of noiseless image laws. |
+| Density ratios | `MeasureModel.imageLaw_ratio`; `MeasureModel.log_imageRatio_ae` | Use the actual pivot image law as the reference measure and cancel base factors without an image-space Jacobian. |
+| Step II | `MeasureModel.imageRatio_ae_eq`; `MeasureModel.pivot_equation` | Obtain a finite linear system on a common set of full pivot measure. |
+| Solve the system | `simAE_of_pivot_equation`; `MeasureModel.stepII` | Multiply by the inverse of `Lᵀ` to obtain fixed witnesses `A,c`. |
+| Step III | `MeasureModel.image_nondegenerate`; `affineWitness_bijective` | Transport nondegeneracy to the image law and prove that the same affine witness is invertible. |
+| Assemble | `correctedTheorem1_stepI_II_III` | Transfer the invertible affine relation from the pivot law to any dominated reference measure `μ`. |
 
-Step III 的核心是：若线性泛函 `ℓ` 满足 `ℓ ∘ A = 0`，则由 `t = A t′ + c` 得到 `ℓ(t) = ℓ(c)` a.e.；非退化性迫使 `ℓ = 0`。Mathlib 的 `LinearMap.dualMap_injective_iff` 给出 `A` 满射，再由有限维的 `LinearMap.injective_iff_surjective` 得到双射。这就是原来讨论的反证思路在 Lean 中的实现。
+For Step III, let a linear functional `ℓ` satisfy `ℓ ∘ A = 0`. The relation `t = A t′ + c` then gives `ℓ(t) = ℓ(c)` almost everywhere, so nondegeneracy forces `ℓ = 0`. Mathlib's `LinearMap.dualMap_injective_iff` yields surjectivity of `A`; finite dimensionality and `LinearMap.injective_iff_surjective` then give bijectivity. This implements the contradiction argument by showing that the dual map has trivial kernel.
 
-## 数学证明文档
+## Mathematical proof documents
 
-- 中文：[PDF](docs/theorem1-ae-proof-zh.pdf) / [TeX](docs/theorem1-ae-proof-zh.tex)。
-- 英文：[PDF](docs/theorem1-ae-proof.pdf) / [TeX](docs/theorem1-ae-proof.tex)。
+- English: [PDF](docs/theorem1-ae-proof.pdf) / [TeX](docs/theorem1-ae-proof.tex).
+- Chinese: [PDF](docs/theorem1-ae-proof-zh.pdf) / [TeX](docs/theorem1-ae-proof-zh.tex).
 
-文档对应同一个当前定理。PDF 重建独立于 Lean 构建；自行安装 Tectonic
-（现有 PDF 使用 0.17.0），然后运行：
+Both documents describe the same current theorem. Rebuilding the PDFs is independent of the Lean build. Install Tectonic separately (the existing PDFs were built with version 0.17.0), then run:
 
 ```bash
 tectonic -X compile docs/theorem1-ae-proof.tex --outdir docs
 tectonic -X compile docs/theorem1-ae-proof-zh.tex --outdir docs
 ```
 
-首次生成 PDF 时，Tectonic 可能需要下载 TeX 支持文件；这不影响 `lake build` 或公理检查。
-本机的 `tools/` 目录由 `.gitignore` 排除，不随仓库发布。
+Tectonic may download TeX support files on its first run. PDF generation is optional for building and checking the Lean proof. The local `tools/` directory is excluded by `.gitignore` and is not distributed with the repository.
