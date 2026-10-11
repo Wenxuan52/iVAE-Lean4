@@ -1,0 +1,287 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{microtype}
+\usepackage[hidelinks]{hyperref}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{iVAE: almost-everywhere affine identifiability}
+\fancyfoot[C]{\thepage}
+\setlength{\headheight}{14pt}
+\setlength{\parskip}{4pt}
+\setlength{\parindent}{0pt}
+\newtheorem{theorem}{Theorem}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Zset}{\mathcal Z}
+\newcommand{\Xset}{\mathcal X}
+\newcommand{\Uset}{\mathcal U}
+\newcommand{\aev}{\text{-a.e.}}
+\newcommand{\push}{_{\#}}
+\newcommand{\GL}{\operatorname{GL}}
+\newcommand{\Leb}{\mathcal L}
+\newcommand{\ip}[2]{\langle #1,#2\rangle}
+\begin{document}
+\begin{center}
+{\Large Almost-Everywhere Affine Identifiability of iVAE}\\[5pt]
+{\normalsize A measure-theoretic refinement of Theorem 1}
+\end{center}
+
+\section*{Notation and Model Setup}
+Let $1\le n\le d$, $m,k\ge1$, $q=nk$, and $s\in\{\theta,\theta'\}$.
+Let $\Zset\subseteq\R^n$ and $\Xset\subseteq\R^d$ be Borel,
+$\Uset\subseteq\R^m$, and
+\[
+ T_s(z)=\bigl(T_{s,i,j}(z_i)\bigr)_{i,j}\in\R^q,\qquad
+ \lambda_s(u)=\bigl(\lambda_{s,i,j}(u)\bigr)_{i,j}\in\R^q.
+\]
+Put $B_s(z)=\prod_iQ_{s,i}(z_i)$, $Z_s(u)=\prod_iZ_{s,i}(u)$, and
+\begin{align}
+ p_{s,u}(z)
+ &=\frac{B_s(z)}{Z_s(u)}e^{\ip{T_s(z)}{\lambda_s(u)}} \label{eq:prior}\\
+ &=\prod_{i=1}^n
+ \left[\frac{Q_{s,i}(z_i)}{Z_{s,i}(u)}
+ e^{\sum_{j=1}^kT_{s,i,j}(z_i)\lambda_{s,i,j}(u)}\right].
+ \nonumber
+\end{align}
+For injective $f_s:\R^n\to\R^d$ with $f_s(\Zset)=\Xset$, write
+$g_s=(f_s|_{\Zset})^{-1}$. Define
+\[
+ \begin{gathered}
+ P_{s,u}(dz)=p_{s,u}(z)\,d\Leb^n|_{\Zset}(z),\qquad t_s=T_s\circ g_s,\\
+ \nu_{s,u}=(f_s|_{\Zset})\push P_{s,u},\qquad
+ \bar\nu_{s,u}=\iota\push\nu_{s,u},\qquad
+ \iota:\Xset\hookrightarrow\R^d.
+ \end{gathered}
+\]
+For a common independent additive noise law $\eta$, let
+\begin{equation}
+ O_{s,\eta}(u)=\bar\nu_{s,u}*\eta. \label{eq:observed}
+\end{equation}
+For a fixed measure $\mu$ on $\Xset$, set
+\[
+ \theta\sim_A^\mu\theta'
+ \iff \exists A\in\GL_q(\R),\ c\in\R^q:
+ \quad t_\theta=A t_{\theta'}+c\quad\mu\aev
+\]
+This is an equivalence relation, by the identity, inverse, and composition
+of affine maps on common full-$\mu$-measure sets.
+
+\begin{theorem}[Corrected a.e. identifiability]\label{thm:main}
+Assume the following.
+\begin{enumerate}[label=\textnormal{(\arabic*)},leftmargin=*,itemsep=4pt]
+\item \textbf{Injective mixing and measurability.}
+\textnormal{(paper assumption (ii); explicit measurable-image interface)}
+For both models, $f_s:\R^n\to\R^d$ is injective,
+$f_s(\Zset)=\Xset$, and $f_s|_{\Zset}:\Zset\to\Xset$ and
+$g_s:\Xset\to\Zset$ are measurable.
+
+\item \textbf{Valid product-form priors.}
+\textnormal{(paper equation (7); explicit probability-model validity)}
+For both models,
+\[
+ Q_{s,i}(v)\ge0\quad(\forall i,v),\qquad
+ 0<Z_{s,i}(u)<\infty\quad(\forall i,u),
+\]
+and, for every $u\in\Uset$, $p_{s,u}$ is measurable with
+$\int_{\Zset}p_{s,u}(z)\,dz=1$.
+
+\item \textbf{Full-frequency noise condition.}
+\textnormal{(strengthened assumption (i))}
+The measure $\eta$ is a probability measure on $\R^d$ and
+\begin{equation}
+ \Leb^d\{\omega\in\R^d:\varphi_\eta(\omega)=0\}=0,\qquad
+ \varphi_\eta(\omega)=\int e^{\mathrm i\ip{\omega}{y}}\,d\eta(y).
+ \label{eq:noise}
+\end{equation}
+
+\item \textbf{Auxiliary variation.}
+\textnormal{(paper assumption (iv))}
+There exist pairwise distinct $u_0,\ldots,u_q\in\Uset$ such that
+\begin{equation}
+ L=[\lambda_\theta(u_1)-\lambda_\theta(u_0)\ \cdots\
+      \lambda_\theta(u_q)-\lambda_\theta(u_0)],\qquad \det L\ne0.
+ \label{eq:L}
+\end{equation}
+
+\item \textbf{Essential affine nondegeneracy of the true pivot prior.}
+\textnormal{(additional assumption for Step III; related to assumption (iii))}
+For every $v\in\R^q$, $b\in\R$,
+\begin{equation}
+ [\,\ip{v}{T_\theta(z)}=b\quad P_{\theta,u_0}\aev\,]
+ \ \Longrightarrow\ v=0. \label{eq:nd}
+\end{equation}
+This condition is assumed, not deduced from the paper's assumption (iii).
+\end{enumerate}
+If
+\begin{equation}
+ O_{\theta,\eta}(u_r)=O_{\theta',\eta}(u_r)
+ \qquad(r=0,\ldots,q), \label{eq:hobs}
+\end{equation}
+then $\sigma:=\nu_{\theta,u_0}=\nu_{\theta',u_0}$ and
+\begin{equation}
+ \exists A\in\GL_q(\R),\ c\in\R^q:
+ \quad t_\theta(x)=A t_{\theta'}(x)+c\quad\sigma\aev \label{eq:conclusion}
+\end{equation}
+Consequently,
+\begin{equation}
+ \mu\ll\sigma\ \Longrightarrow\ \theta\sim_A^\mu\theta'.
+ \label{eq:equivalence}
+\end{equation}
+The same $A,c$ apply to every such $\mu$, including all $\nu_{s,u}$.
+\end{theorem}
+
+\begin{proof}\mbox{}\par
+\noindent\textbf{Step I.}
+For $r=0,\ldots,q$, the convolution identity and \eqref{eq:hobs} give
+\[
+ \varphi_{\bar\nu_{\theta,u_r}}\varphi_\eta
+ =\varphi_{\bar\nu_{\theta',u_r}}\varphi_\eta.
+\]
+By \eqref{eq:noise}, continuity of characteristic functions, and Fourier
+uniqueness for finite measures,
+\[
+ \begin{aligned}
+ &\varphi_{\bar\nu_{\theta,u_r}}
+   =\varphi_{\bar\nu_{\theta',u_r}}\quad\Leb^d\aev\\
+ &\Longrightarrow\
+   \varphi_{\bar\nu_{\theta,u_r}}
+   =\varphi_{\bar\nu_{\theta',u_r}}\quad\text{everywhere}\\
+ &\Longrightarrow\ \bar\nu_{\theta,u_r}=\bar\nu_{\theta',u_r}.
+ \end{aligned}
+\]
+Here continuity upgrades a.e. equality since every nonempty open subset
+of $\R^d$ has positive Lebesgue measure.
+The inclusion $\iota$ is a measurable embedding; hence
+\begin{equation}
+ \nu_{\theta,u_r}=\nu_{\theta',u_r}\qquad(r=0,\ldots,q).
+ \label{eq:hlaw}
+\end{equation}
+In particular, $\sigma=\nu_{\theta,u_0}=\nu_{\theta',u_0}$ is a probability measure.
+
+\medskip
+\noindent\textbf{Step II.}
+Fix $s\in\{\theta,\theta'\}$ and $u\in\Uset$. By \eqref{eq:prior},
+\begin{equation}
+ p_{s,u}(z)=0\iff B_s(z)=0\iff p_{s,u_0}(z)=0. \label{eq:zeros}
+\end{equation}
+Define the nonnegative measurable ratio
+\begin{equation}
+ r_{s,u}(z)=
+ \begin{cases}
+ p_{s,u}(z)/p_{s,u_0}(z),&p_{s,u_0}(z)>0,\\
+ 0,&p_{s,u_0}(z)=0.
+ \end{cases} \label{eq:ratio}
+\end{equation}
+Using \eqref{eq:zeros},
+\begin{equation}
+ p_{s,u_0}r_{s,u}=p_{s,u}\quad\text{on }\Zset, \label{eq:densityproduct}
+\end{equation}
+and therefore
+\begin{equation}
+ P_{s,u}=r_{s,u}\,P_{s,u_0}. \label{eq:latentweight}
+\end{equation}
+Let $R_{s,u}=r_{s,u}\circ g_s$. For every measurable $E\subseteq\Xset$,
+\[
+ \nu_{s,u}(E)
+ =\int_{(f_s|_{\Zset})^{-1}(E)}r_{s,u}\,dP_{s,u_0}
+ =\int_E R_{s,u}\,d\nu_{s,u_0}.
+\]
+Thus
+\begin{equation}
+ \nu_{s,u}=R_{s,u}\,\nu_{s,u_0},\qquad
+ \nu_{s,u}\ll\nu_{s,u_0}. \label{eq:imageweight}
+\end{equation}
+Since $P_{s,u_0}\{p_{s,u_0}=0\}=0$, cancellation in \eqref{eq:ratio} gives
+\[
+ r_{s,u}(z)=\frac{Z_s(u_0)}{Z_s(u)}
+ e^{\ip{T_s(z)}{\lambda_s(u)-\lambda_s(u_0)}}>0
+ \quad P_{s,u_0}\aev
+\]
+Set $a_s(u)=\log Z_s(u)$ and
+$\Delta\lambda_s(u)=\lambda_s(u)-\lambda_s(u_0)$. Taking logarithms and
+pushing forward,
+\begin{equation}
+ \log R_{s,u}(x)=\ip{t_s(x)}{\Delta\lambda_s(u)}
+ -[a_s(u)-a_s(u_0)]\quad\nu_{s,u_0}\aev \label{eq:logratio}
+\end{equation}
+From \eqref{eq:hlaw} and \eqref{eq:imageweight},
+\[
+ R_{\theta,u_r}\,\sigma=R_{\theta',u_r}\,\sigma.
+\]
+Uniqueness of densities with respect to the same finite measure yields
+\begin{equation}
+ R_{\theta,u_r}=R_{\theta',u_r}\quad\sigma\aev \label{eq:ratioeq}
+\end{equation}
+Combining \eqref{eq:logratio}--\eqref{eq:ratioeq},
+\begin{align}
+ \ip{t_\theta(x)}{\Delta\lambda_\theta(u_r)}
+ -[a_\theta(u_r)-a_\theta(u_0)]
+ &=\ip{t_{\theta'}(x)}{\Delta\lambda_{\theta'}(u_r)}\nonumber\\
+ &\quad-[a_{\theta'}(u_r)-a_{\theta'}(u_0)]
+ \quad\sigma\aev \label{eq:pivotrow}
+\end{align}
+Intersecting finitely many full-$\sigma$-measure sets makes these identities
+simultaneous for $r=1,\ldots,q$. With
+\[
+ \begin{aligned}
+ L'&=[\Delta\lambda_{\theta'}(u_1)\ \cdots\
+          \Delta\lambda_{\theta'}(u_q)],\\
+ b_r&=[a_\theta(u_r)-a_\theta(u_0)]
+       -[a_{\theta'}(u_r)-a_{\theta'}(u_0)],
+ \end{aligned}
+\]
+equation \eqref{eq:pivotrow} becomes
+\begin{equation}
+ L^\top t_\theta=(L')^\top t_{\theta'}+b\quad\sigma\aev \label{eq:matrix}
+\end{equation}
+Since $\det L\ne0$, set
+\begin{equation}
+ A=(L^\top)^{-1}(L')^\top,\qquad c=(L^\top)^{-1}b. \label{eq:witness}
+\end{equation}
+Then
+\begin{equation}
+ t_\theta=A t_{\theta'}+c\quad\sigma\aev \label{eq:stepii}
+\end{equation}
+
+\medskip
+\noindent\textbf{Step III.}
+Using $\sigma=(f_\theta|_{\Zset})\push P_{\theta,u_0}$ and
+$t_\theta\circ f_\theta|_{\Zset}=T_\theta|_{\Zset}$, assumption \eqref{eq:nd} gives
+\[
+ \begin{aligned}
+ [\,\ip{v}{t_\theta}=b\quad\sigma\aev\,]
+ &\Longrightarrow
+ [\,\ip{v}{T_\theta}=b\quad P_{\theta,u_0}\aev\,]\\
+ &\Longrightarrow v=0.
+ \end{aligned}
+\]
+If $A$ were singular, choose $0\ne v\in\ker A^\top$. By \eqref{eq:stepii},
+\[
+ \ip{v}{t_\theta}
+ =\ip{A^\top v}{t_{\theta'}}+\ip{v}{c}
+ =\ip{v}{c}\quad\sigma\aev,
+\]
+forcing $v=0$, a contradiction. Thus $A\in\GL_q(\R)$.
+
+For $\mu\ll\sigma$, the exceptional set in \eqref{eq:stepii} is also
+$\mu$-null, proving \eqref{eq:equivalence} with the same $A,c$.
+Finally, \eqref{eq:imageweight} implies
+$\nu_{s,u}\ll\nu_{s,u_0}=\sigma$ for every $s,u$.
+\end{proof}
+
+\noindent\emph{Scope.}
+Only injectivity on $\Zset$ is used; no ambient surjectivity or
+$n=d$ assumption is required. The conclusion is a.e., not pointwise.
+The full-frequency condition and \eqref{eq:nd} are explicit corrections
+to the original theorem of \cite{ivae}.
+
+\begin{thebibliography}{1}
+\bibitem{ivae}
+I.~Khemakhem, D.~P.~Kingma, R.~Monti, and A.~Hyv\"arinen.
+\emph{Variational Autoencoders and Nonlinear ICA: A Unifying Framework}.
+arXiv:1907.04809v4, 2020. Theorem 1 and Appendix B.2.
+\url{https://arxiv.org/abs/1907.04809v4}.
+\end{thebibliography}
+\end{document}

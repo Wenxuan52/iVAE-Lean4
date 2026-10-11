@@ -1,0 +1,454 @@
+\documentclass[UTF8,fontset=fandol,11pt,a4paper]{ctexart}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[hidelinks]{hyperref}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{iVAE：修正版几乎处处可识别性}
+\fancyfoot[C]{\thepage}
+\setlength{\headheight}{15pt}
+\setlength{\parskip}{4pt}
+\setlength{\parindent}{0pt}
+\theoremstyle{definition}
+\newtheorem{theorem}{定理}
+\newtheorem{lemma}{引理}
+\newtheorem{definition}{定义}
+\renewcommand{\proofname}{证明}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Zset}{\mathcal Z}
+\newcommand{\Xset}{\mathcal X}
+\newcommand{\Uset}{\mathcal U}
+\newcommand{\aev}{\text{-a.e.}}
+\newcommand{\push}{_{\#}}
+\newcommand{\GL}{\operatorname{GL}}
+\newcommand{\End}{\operatorname{End}}
+\newcommand{\Leb}{\mathcal L}
+\newcommand{\ip}[2]{\langle #1,#2\rangle}
+\title{iVAE 的几乎处处仿射可识别性\\
+\large 修正版定理一：Step I--III 的完整证明}
+\author{}
+\date{2026 年 10 月 4 日}
+\begin{document}
+\maketitle
+\vspace{-2em}
+
+\section{预备知识（Preliminaries）}
+
+设 $1\le n\le d$、$m\ge1$、$k\ge1$，记 $q=nk$。
+令 $\Zset\subseteq\R^n$、$\Xset\subseteq\R^d$ 为 Borel 集，
+$\Uset\subseteq\R^m$ 为辅助变量的取值集合。
+我们比较定义在这些共同区域上的两个模型 $s\in\{\theta,\theta'\}$。
+每个模型的充分统计量向量与自然参数向量分别记为
+\[
+ T_s(z)=\bigl(T_{s,i,j}(z_i)\bigr)_{1\le i\le n,\,1\le j\le k}\in\R^q,
+ \qquad \lambda_s(u)\in\R^q.
+\]
+$T_s$ 和 $\lambda_s$ 的各分量均为实数值。记
+\[
+ B_s(z)=\prod_{i=1}^n Q_{s,i}(z_i),\qquad
+ Z_s(u)=\prod_{i=1}^n Z_{s,i}(u).
+\]
+相对于潜变量区域 $\Zset$ 上的 Lebesgue 测度，条件先验密度为
+\begin{align}
+ p_{s,u}(z)
+ &=\frac{B_s(z)}{Z_s(u)}
+   \exp\!\bigl(\ip{T_s(z)}{\lambda_s(u)}\bigr) \label{eq:prior}\\
+ &=\prod_{i=1}^n\frac{Q_{s,i}(z_i)}{Z_{s,i}(u)}
+   \exp\!\left(\sum_{j=1}^k T_{s,i,j}(z_i)\lambda_{s,i,j}(u)\right).
+ \nonumber
+\end{align}
+对应的先验概率测度记为
+$P_{s,u}(dz)=p_{s,u}(z)\,d\Leb^n|_{\Zset}(z)$。
+
+沿用原论文的记号，混合函数写为 $f_s:\R^n\to\R^d$，并假设它是单射。
+两个模型在潜变量区域 $\Zset$ 上的像均为 $f_s(\Zset)=\Xset$。
+因此，限制后的映射 $f_s|_{\Zset}:\Zset\to\Xset$ 是双射，
+其逆函数为 $g_s=(f_s|_{\Zset})^{-1}:\Xset\to\Zset$。
+这里不要求 $f_s$ 映满整个 $\R^d$。
+下文对 $\Zset$ 上的测度使用 $f_s$ 作推前时，均指这一限制后的映射。
+
+定义无噪声观测在像空间上的分布及其在环境空间中的表示：
+\[
+ \nu_{s,u}=(f_s)\push P_{s,u},\qquad
+ \bar\nu_{s,u}=\iota\push\nu_{s,u},\qquad
+ \iota:\Xset\hookrightarrow\R^d.
+\]
+符号 $f\push P$ 表示推前测度，即随机变量服从 $P$ 时，经过 $f$ 后的分布。
+设两个模型使用相同、独立的加性噪声分布 $\eta$，则含噪观测分布为
+\begin{equation}
+ O_{s,\eta}(u)=\bar\nu_{s,u}*\eta. \label{eq:observed}
+\end{equation}
+其中 $*$ 表示卷积。$\Xset$ 是\emph{无噪声}像空间，不是含噪观测的支撑集。
+像空间上的统计量函数记为
+\[
+ t_s(x)=T_s(g_s(x)),\qquad x\in\Xset.
+\]
+
+\begin{definition}[相对于固定测度的仿射关系]
+给定 $\Xset$ 上的测度 $\mu$，一般的几乎处处仿射关系指
+\[
+ \exists A\in\End_{\R}(\R^q),\ c\in\R^q,
+ \qquad t_\theta(x)=A t_{\theta'}(x)+c\quad\mu\aev
+\]
+其中 $\End_{\R}(\R^q)$ 表示实线性映射的全体；$\mu$-a.e. 表示等式在一个
+$\mu$-零测集之外成立。若还要求 $A\in\GL_q(\R)$，即 $A$ 可逆，
+则记为 $\theta\sim_A^\mu\theta'$。
+\end{definition}
+一般仿射关系不一定对称。对固定的 $\mu$，可逆仿射关系是等价关系：
+恒等变换给出自反性；逆变换 $(A^{-1},-A^{-1}c)$ 给出对称性；
+复合两个仿射变换，并取两个满测度集合的交集，给出传递性。
+
+\section{修正版定理及其全部假设}
+
+\begin{theorem}[几乎处处可识别性的修正版]\label{thm:main}
+考虑上述两个模型，假设以下条件成立。
+\begin{enumerate}[label=\textnormal{(\arabic*)},leftmargin=*,itemsep=5pt]
+\item \textbf{混合函数的单射性与可测性。}
+\textnormal{（原文 assumption (ii)；显式的可测像空间条件）}
+共同区域 $\Zset,\Xset$ 为 Borel 集。对两个模型，
+$f_s:\R^n\to\R^d$ 都是单射，且 $f_s(\Zset)=\Xset$。
+像空间上的映射 $f_s|_{\Zset}:\Zset\to\Xset$ 及其逆
+$g_s:\Xset\to\Zset$ 对相应的诱导 Borel 结构均可测。
+两个模型共享同一个像；不要求覆盖整个 $\R^d$。
+
+\item \textbf{乘积形式先验的概率有效性。}
+\textnormal{（原文模型公式 (7)；显式的概率模型有效性条件）}
+对两个模型，所有 $i,v$ 都满足 $Q_{s,i}(v)\ge0$，所有 $i,u$ 都满足
+$0<Z_{s,i}(u)<\infty$。对每个 $u\in\Uset$，
+密度 \eqref{eq:prior} 在 $\Zset$ 上可测，且
+\[
+ \int_{\Zset}p_{s,u}(z)\,dz=1.
+\]
+允许基函数取零；不要求先验密度处处严格为正。
+
+\item \textbf{整个频域上的噪声条件。}
+\textnormal{（strengthened assumption (i)，即原文假设 (i) 的加强）}
+共同噪声 $\eta$ 是 $\R^d$ 上的概率测度，且
+\begin{equation}
+ \Leb^d\{\omega\in\R^d:\varphi_\eta(\omega)=0\}=0,
+ \qquad
+ \varphi_\eta(\omega)=\int e^{\mathrm i\ip{\omega}{y}}\,d\eta(y).
+ \label{eq:noise}
+\end{equation}
+这里是在\emph{整个频域} $\R^d$ 上对特征函数的零集取测度。
+
+\item \textbf{真实模型自然参数的辅助变量变化条件。}
+\textnormal{（原文 assumption (iv)）}
+存在 $q+1$ 个两两不同的点 $u_0,u_1,\ldots,u_q\in\Uset$，使得
+\begin{equation}
+ L=\bigl[\lambda_\theta(u_1)-\lambda_\theta(u_0)\ \cdots\
+         \lambda_\theta(u_q)-\lambda_\theta(u_0)\bigr]
+ \in\R^{q\times q},\qquad \det L\ne0. \label{eq:L}
+\end{equation}
+不预先要求第二个模型对应的矩阵 $L'$ 可逆。
+
+\item \textbf{真实基准先验下统计量的 a.e. 仿射非退化性。}
+\textnormal{（Step III 的新增假设；与原文 assumption (iii) 有关）}
+对任意 $v\in\R^q$ 和 $b\in\R$，
+\begin{equation}
+ \left[\ip{v}{T_\theta(z)}=b\quad P_{\theta,u_0}\aev\right]
+ \quad\Longrightarrow\quad v=0. \label{eq:nd}
+\end{equation}
+也就是说，统计量的非零线性组合不能在真实基准先验下几乎必然为常数。
+这是显式增加的假设；未声称它可由原文的几乎处处可微性与线性独立性推出。
+此条件不要求矩存在，也不需要协方差矩阵。
+\end{enumerate}
+若两个模型在选定辅助点上的含噪观测分布相同，即
+\begin{equation}
+ O_{\theta,\eta}(u_r)=O_{\theta',\eta}(u_r),
+ \qquad r=0,\ldots,q, \label{eq:hobs}
+\end{equation}
+则它们在基准点 $u_0$ 处的无噪声分布相同。记
+\[
+ \sigma=\nu_{\theta,u_0}=\nu_{\theta',u_0}.
+\]
+存在一组固定的 $A\in\GL_q(\R)$ 与 $c\in\R^q$，使得
+\begin{equation}
+ t_\theta(x)=A t_{\theta'}(x)+c\quad\sigma\aev \label{eq:conclusion}
+\end{equation}
+因此，对 $\Xset$ 上任意满足 $\mu\ll\sigma$ 的固定测度 $\mu$，都有
+\begin{equation}
+ \boxed{\theta\sim_A^\mu\theta'.} \label{eq:equivalence}
+\end{equation}
+同一组 $A,c$ 对所有这样的 $\mu$ 都有效。
+\end{theorem}
+
+$\mu\ll\sigma$ 表示绝对连续性：每个 $\sigma$-零测集也是 $\mu$-零测集。
+这里不把 $\mu$ 硬编码为 $\sigma$，而是明确保留它的选择。
+
+条件 (1) 的全局单射写法沿用原文。实际证明与 Lean 形式化只需 $f_s$ 在
+$\Zset$ 上单射，因此覆盖这里的全局单射情形。
+仅在 $\Zset$ 上单射不能反推全局单射。
+各标题后的括号区分了原文条件与本证明显式使用的测度论条件。
+
+式 \eqref{eq:hobs} 只要求有限个辅助点上的分布相同；若对所有 $u$ 都相同，
+自然满足这一前提。消去噪声的证明也适用于有限噪声测度；这里取概率测度，
+以对应生成模型中的噪声分布。
+
+\section{Step I：证明无噪声概率测度相等}
+
+\begin{lemma}[去卷积]\label{lem:deconv}
+设 $\alpha,\beta,\eta$ 为 $\R^d$ 上的有限 Borel 测度。
+若 \eqref{eq:noise} 成立且 $\alpha*\eta=\beta*\eta$，则 $\alpha=\beta$。
+\end{lemma}
+\begin{proof}
+卷积的 Fourier 变换等于各自 Fourier 变换的乘积，因此对每个频率 $\omega$，
+\[
+ \varphi_\alpha(\omega)\varphi_\eta(\omega)
+ =\varphi_\beta(\omega)\varphi_\eta(\omega).
+\]
+在 $\varphi_\eta$ 的零集之外，消去非零因子，得到
+$\varphi_\alpha(\omega)=\varphi_\beta(\omega)$。
+噪声条件保证这个零集的 Lebesgue 测度为零。
+
+有限测度的特征函数连续。两个连续函数在 $\R^d$ 上 Lebesgue-a.e. 相等，
+就必然处处相等：若某一点不等，连续性会给出一个二者不等的非空开集；
+非空开集具有正 Lebesgue 测度，与 a.e. 相等矛盾。
+因此 $\varphi_\alpha=\varphi_\beta$ 处处成立。
+由有限测度的 Fourier 变换唯一性，得到 $\alpha=\beta$。
+\end{proof}
+
+对每个 $r$，将引理~\ref{lem:deconv} 应用于 \eqref{eq:hobs}，得到
+\[
+ \bar\nu_{\theta,u_r}=\bar\nu_{\theta',u_r}.
+\]
+Borel 子集 $\Xset$ 到 $\R^d$ 的包含映射是可测嵌入，
+其推前测度相等蕴含原测度相等。因此
+\begin{equation}
+ \nu_{\theta,u_r}=\nu_{\theta',u_r},\qquad r=0,\ldots,q.
+ \label{eq:hlaw}
+\end{equation}
+特别地，共同基准分布 $\sigma$ 存在，并且是概率测度。
+这一过程不要求无噪声分布具有 Lebesgue 密度。
+这里证明的是\emph{测度相等}，不是某个选定密度函数的逐点相等。
+
+\section{Step II：密度比与仿射关系}
+
+\subsection{共同零集与可测的密度比}
+
+固定任一模型 $s$。式 \eqref{eq:prior} 中的正规化常数和指数因子均严格为正，所以
+\begin{equation}
+ p_{s,u}(z)=0\quad\Longleftrightarrow\quad B_s(z)=0
+ \quad\Longleftrightarrow\quad p_{s,u_0}(z)=0. \label{eq:zeros}
+\end{equation}
+因此不同 $u$ 对应的先验密度具有相同零集。
+尤其是，$p_{s,u_0}>0$ 在 $P_{s,u_0}$ 下几乎必然成立：
+密度为零的集合在这个密度定义的概率测度下概率为零。
+定义可测函数
+\begin{equation}
+ r_{s,u}(z)=
+ \begin{cases}
+ p_{s,u}(z)/p_{s,u_0}(z),&p_{s,u_0}(z)>0,\\
+ 0,&p_{s,u_0}(z)=0.
+ \end{cases} \label{eq:ratio}
+\end{equation}
+以下等式对每个 $z$ 成立：
+\begin{equation}
+ p_{s,u_0}(z)r_{s,u}(z)=p_{s,u}(z). \label{eq:densityproduct}
+\end{equation}
+在基准密度为正的点，直接约分即可；在其零集上，
+由 \eqref{eq:zeros} 可知等式两边均为零。
+因此，作为测度的等式，有
+\begin{equation}
+ P_{s,u}=r_{s,u}\,P_{s,u_0}. \label{eq:latentweight}
+\end{equation}
+这里仅使用实际先验密度的可测性；不需要额外规定统计量在零概率区域上
+任意选取的代表值具有全局可测性。
+
+\subsection{将密度比推到无噪声像空间}
+
+令 $R_{s,u}(x)=r_{s,u}(g_s(x))$。
+由于 $g_s$ 可测，$R_{s,u}$ 也可测。
+对任意可测集 $E\subseteq\Xset$，由推前测度的定义，
+\begin{align*}
+ \nu_{s,u}(E)
+ &=\int_{f_s^{-1}(E)}r_{s,u}(z)\,dP_{s,u_0}(z)\\
+ &=\int_E R_{s,u}(x)\,d\nu_{s,u_0}(x).
+\end{align*}
+这里利用了 $g_s(f_s(z))=z$，所以权重经过映射后仍精确对应。
+于是
+\begin{equation}
+ \nu_{s,u}=R_{s,u}\,\nu_{s,u_0},\qquad
+ \nu_{s,u}\ll\nu_{s,u_0}. \label{eq:imageweight}
+\end{equation}
+这个密度相对于像空间上的基准概率测度定义，
+而非相对于环境空间中的 $d$ 维 Lebesgue 测度定义。
+
+\subsection{消去基函数并得到对数等式}
+
+在所有满足 $p_{s,u_0}(z)>0$ 的点，消去共同基函数 $B_s(z)$，得到
+\[
+ r_{s,u}(z)=\frac{Z_s(u_0)}{Z_s(u)}
+ \exp\!\left(\ip{T_s(z)}{\lambda_s(u)-\lambda_s(u_0)}\right)>0.
+\]
+记 $a_s(u)=\log Z_s(u)$，以及
+$\Delta\lambda_s(u)=\lambda_s(u)-\lambda_s(u_0)$。
+取对数，再将关系推到像空间，得到
+\begin{equation}
+ \log R_{s,u}(x)=\ip{t_s(x)}{\Delta\lambda_s(u)}
+ -\bigl(a_s(u)-a_s(u_0)\bigr)
+ \quad\nu_{s,u_0}\aev \label{eq:logratio}
+\end{equation}
+在一个基准分布的满测度集合上，这里取对数的数都严格为正。
+零测补集上如何约定对数值，不影响这个几乎处处结论。
+
+两个模型的基准测度都等于 $\sigma$。由 \eqref{eq:hlaw} 和
+\eqref{eq:imageweight}，
+\[
+ R_{\theta,u_r}\,\sigma=R_{\theta',u_r}\,\sigma.
+\]
+相对于同一有限测度，非负可测密度具有几乎处处唯一性。因此
+\begin{equation}
+ R_{\theta,u_r}=R_{\theta',u_r}\quad\sigma\aev \label{eq:ratioeq}
+\end{equation}
+将 \eqref{eq:ratioeq} 与两个模型各自的 \eqref{eq:logratio} 合并，得到
+\begin{align}
+ \ip{t_\theta(x)}{\Delta\lambda_\theta(u_r)}
+ -\bigl(a_\theta(u_r)-a_\theta(u_0)\bigr)
+ &=\ip{t_{\theta'}(x)}{\Delta\lambda_{\theta'}(u_r)}\nonumber\\[-2pt]
+ &\quad-\bigl(a_{\theta'}(u_r)-a_{\theta'}(u_0)\bigr)
+ \quad\sigma\aev \label{eq:pivotrow}
+\end{align}
+这里只需要 $q$ 行等式。
+将它们以及各对数等式对应的满测度集合取有限交，
+就得到一个共同的满 $\sigma$-测度集合，所有等式在其上同时成立。
+证明没有对不可数多个辅助变量取值对应的集合取交。
+
+\subsection{求解有限维方程组}
+
+用 $\lambda_{\theta'}$ 按式 \eqref{eq:L} 定义矩阵 $L'$，并令
+\[
+ b_r=\bigl(a_\theta(u_r)-a_\theta(u_0)\bigr)
+ -\bigl(a_{\theta'}(u_r)-a_{\theta'}(u_0)\bigr),
+ \qquad r=1,\ldots,q.
+\]
+同时成立的式 \eqref{eq:pivotrow} 可以写成
+\begin{equation}
+ L^\top t_\theta(x)=(L')^\top t_{\theta'}(x)+b
+ \quad\sigma\aev \label{eq:matrix}
+\end{equation}
+因为 $\det L\ne0$，可以定义
+\begin{equation}
+ A=(L^\top)^{-1}(L')^\top,\qquad
+ c=(L^\top)^{-1}b. \label{eq:witness}
+\end{equation}
+在式 \eqref{eq:matrix} 两侧左乘 $(L^\top)^{-1}$，得到
+\begin{equation}
+ t_\theta(x)=A t_{\theta'}(x)+c\quad\sigma\aev \label{eq:stepii}
+\end{equation}
+$A$ 和 $c$ 都是固定的，不依赖 $x$。
+至此 Step II 完成；这一阶段既未使用、也尚未证明 $A$ 可逆。
+
+\section{Step III：证明同一个仿射映射可逆}
+
+首先将非退化假设从潜变量空间推到无噪声像空间。
+若 $\ip{v}{t_\theta(x)}=b$ 在 $\sigma$ 下几乎处处成立，
+由 $\sigma=(f_\theta)\push P_{\theta,u_0}$ 以及
+$t_\theta(f_\theta(z))=T_\theta(z)$，可得
+\[
+ \ip{v}{T_\theta(z)}=b\quad P_{\theta,u_0}\aev
+\]
+假设 \eqref{eq:nd} 于是给出 $v=0$。
+因此 $t_\theta$ 在 $\sigma$ 下也不存在非平凡的几乎必然仿射约束。
+
+假设式 \eqref{eq:witness} 中的方阵 $A$ 不可逆。
+有限维线性代数保证存在非零向量 $v\in\R^q$，满足 $A^\top v=0$。
+对式 \eqref{eq:stepii} 两侧作用线性泛函 $y\mapsto\ip{v}{y}$。
+在同一个满测度集合上，
+\begin{align*}
+ \ip{v}{t_\theta(x)}
+ &=\ip{v}{A t_{\theta'}(x)}+\ip{v}{c}\\
+ &=\ip{A^\top v}{t_{\theta'}(x)}+\ip{v}{c}
+ =\ip{v}{c}.
+\end{align*}
+像空间上的非退化性要求 $v=0$，与其非零矛盾。
+故 $A\in\GL_q(\R)$。
+
+等价地说，若某个线性泛函在 $A$ 的像上恒为零，
+则它作用于 $t_\theta$ 后几乎必然为常数，因此该泛函只能是零泛函。
+于是 $A$ 的像是整个 $\R^q$；有限维空间上的满射线性自映射必为双射。
+这一论证适用于\emph{每一个}满足式 \eqref{eq:stepii} 的仿射映射，
+尤其适用于式 \eqref{eq:witness} 给出的显式 $A$。
+
+最后，设 $\mu\ll\sigma$。式 \eqref{eq:stepii} 的例外集合是
+$\sigma$-零测集，因此也是 $\mu$-零测集。
+已经证明可逆的同一个 $A$，连同同一个 $c$，即给出式 \eqref{eq:equivalence}。
+定理~\ref{thm:main} 得证。\hfill$\square$
+
+\section{这个结论具体识别了什么}
+
+对\emph{固定}的参考测度 $\mu$，结论识别的是
+$t_s=T_s\circ f_s^{-1}$ 在可逆仿射变换下、忽略 $\mu$-零测集后的等价类。
+特别地，可以反向写成
+\[
+ t_{\theta'}(x)=A^{-1}t_\theta(x)-A^{-1}c\quad\mu\aev
+\]
+这不是分别唯一识别 $f_s$、$T_s$ 或神经网络权重的结论，
+也不声称变分 encoder 等于 $f_s^{-1}$。
+基准测度可以依赖被比较的观测分布族；一旦选定，等价关系中的测度就保持固定。
+
+由式 \eqref{eq:imageweight}，任意 $\nu_{s,u}$ 都绝对连续于其基准分布，
+而两个模型的基准分布均为 $\sigma$。
+因此同一个满 $\sigma$-测度集合和同一组 $A,c$，
+也使仿射关系在两个模型的每一个条件无噪声分布下几乎必然成立。
+这个推论不需要额外声称两个模型在未选定辅助点上的含噪观测分布相等。
+
+证明顺序很重要：先在完整的真实基准概率分布下证明 $A$ 可逆，再将结论传到 $\mu$。
+任意被支配测度可能是零测度，也可能只覆盖信息不足的子集；
+仅在这种较小测度下成立的仿射等式，本身不一定能约束 $A$ 的秩。
+
+\section{适用范围及与原定理的区别}
+
+本证明保留了原论文的乘积形式指数族先验、混合函数的单射性，
+以及 $nk+1$ 个辅助点构造变化矩阵的机制。
+修正之处明确如下。
+\begin{enumerate}[leftmargin=*,itemsep=4pt]
+\item \textbf{结论是几乎处处，而非处处成立。}
+我们比较的是忽略零测集后的函数代表。
+这里没有额外使用连续性或其他正则性，将结论升级为原 Definition 2 的逐点关系。
+
+\item \textbf{噪声条件作用于整个频域。}
+式 \eqref{eq:noise} 使用 $\R^d$，而不是原文 assumption (i)
+字面写法中的无噪声像 $\Xset$。这两个条件没有被视为相同条件。
+
+\item \textbf{显式增加 a.e. 仿射非退化性。}
+式 \eqref{eq:nd} 是已批准的真实基准先验上的额外假设。
+未声称它可由原文 assumption (iii)、最小表示约定或导数引理推出。
+当前论证不需要统计量的几乎处处可微性；
+若保留原文这些正则性条件作为额外前提，证明仍然成立。
+
+\item \textbf{使用可测像空间，覆盖 $n<d$。}
+像空间是 Borel 集，不要求它在 $\R^d$ 中为开集。
+混合函数及像上逆函数的可测性均明确列出。
+无噪声像分布可以相对于 $\Leb^d$ 奇异。
+相对于 $\sigma$ 的密度比避免了方形逆 Jacobian 和流形面积公式；
+整个证明不依赖 $n=d$。
+\end{enumerate}
+因此，这是一条在所列假设下完整证明的\emph{修正版} a.e. 可识别性定理。
+它没有证明原论文的 everywhere 定理，
+此前针对逐点结论建立的反例也不因本结果而消失。
+
+\paragraph{形式化验证。}
+模型构造、去卷积、密度比恒等式、有限辅助点方程组、非退化性的推前，
+以及可逆性论证，均已用 Lean 4 和 Mathlib 形式化。
+主定理名称为
+\begin{center}
+\texttt{IVAE.correctedTheorem1\_stepI\_II\_III}。
+\end{center}
+通过将 $\R^q$ 上的线性泛函写成与系数向量的内积，
+已经证明代码中的泛函形式非退化性与式 \eqref{eq:nd} 等价。
+机器验证的结果允许任意有限维数及有限噪声测度，
+因此包含定理~\ref{thm:main} 的维数范围和概率噪声情形。
+本文件与英文版采用相同的公式编号，呈现数学证明，
+不逐行翻译 tactic，也不是自动导出的代码审核表。
+
+\begin{thebibliography}{1}
+\bibitem{ivae}
+I.~Khemakhem, D.~P.~Kingma, R.~Monti, and A.~Hyv\"arinen.
+\emph{Variational Autoencoders and Nonlinear ICA: A Unifying Framework}.
+arXiv:1907.04809v4, 2020，定理一及附录 B.2。
+\url{https://arxiv.org/abs/1907.04809v4}.
+\end{thebibliography}
+\end{document}
